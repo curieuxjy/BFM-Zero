@@ -1318,18 +1318,7 @@
         });
       });
       
-      // 添加视频悬停播放功能 - Goal Reaching
-      const goalVideos = document.querySelectorAll('#goalGalleryContainer .gallery-item video');
-      goalVideos.forEach(video => {
-        video.addEventListener('mouseenter', function() {
-          this.play();
-        });
-        
-        video.addEventListener('mouseleave', function() {
-          this.pause();
-          this.currentTime = 0;
-        });
-      });
+      // Goal Reaching videos now autoplay continuously without hover interaction
 
       // Basic Locomotion 子选项卡自动播放功能
       let autoPlayInterval;
@@ -1644,11 +1633,11 @@
                 <a href="https://scholar.google.com/citations?user=-jQ-FRoAAAAJ&hl=en">Mateusz Guzek</a>&nbsp;&nbsp;
                 <a href="https://scholar.google.com/citations?user=D4LT5xAAAAAJ&hl=en">Ahmed Touati</a>&nbsp;&nbsp;
                 <a href="https://scholar.google.com/citations?user=6JZ3R6wAAAAJ&hl=en">Alessandro Lazaric</a>&nbsp;&nbsp;
-                <a href="https://teopir.github.io/">Matteo Pirotta<span class="superscript">+</span></a>&nbsp;&nbsp;
-                <a href="https://www.gshi.me/">Guanya Shi<span class="superscript">+</span></a>&nbsp;&nbsp;
+                <a href="https://teopir.github.io/">Matteo Pirotta<span class="superscript">†</span></a>&nbsp;&nbsp;
+                <a href="https://www.gshi.me/">Guanya Shi<span class="superscript">†</span></a>&nbsp;&nbsp;
               </span>
               <div style="margin-top: 10px; font-size: 0.9em; color: #666;">
-                * <span style="font-size: 0.8em;">Equal contribution</span>  &nbsp;&nbsp; $ <span style="font-size: 0.8em;">Equal contribution</span> &nbsp;&nbsp; + <span style="font-size: 0.8em;">Equal advising</span>
+                * <span style="font-size: 0.8em;">Equal contribution</span>  &nbsp;&nbsp; $ <span style="font-size: 0.8em;">Equal contribution</span> &nbsp;&nbsp; † <span style="font-size: 0.8em;">Equal advising</span>
               </div>
             </div>
   
@@ -2009,7 +1998,7 @@
       </div>
       
       <div class="gallery-item">
-        <video muted playsinline>
+        <video muted playsinline autoplay loop>
           <source src="./resources/goal_reaching/any2pose/robust-1.mp4" type="video/mp4">
           Your browser does not support the video tag.
         </video>
