@@ -256,8 +256,8 @@
       }
       
       .flip-card {
-        width: 100%;
-        max-width: 250px;
+      width: 100%;
+      max-width: 250px;
         margin: 0 auto;
       }
       
@@ -317,7 +317,7 @@
       .gallery-item video {
         width: 100%;
         max-width: 120px;
-        height: auto;
+      height: auto;
         border-radius: 3px;
         border: none !important;
         background: transparent !important;
@@ -507,7 +507,7 @@
       /* Button mobile optimization */
       .button {
         padding: 0.4rem 0.8rem;
-        font-size: 0.8rem;
+      font-size: 0.8rem;
       }
       
       /* Table mobile optimization */
@@ -638,10 +638,10 @@
         padding: 0.5px;
         border: none !important;
         background: transparent !important;
-      }
-      
-      .gallery-item video {
-        width: 100%;
+    }
+    
+    .gallery-item video {
+      width: 100%;
         max-width: 80px;
         height: auto;
         border-radius: 2px;
@@ -662,9 +662,9 @@
         background: transparent !important;
         margin: 0 !important;
         padding: 0 !important;
-      }
-      
-      .gallery-item h4 {
+    }
+    
+    .gallery-item h4 {
         margin: 0.2rem 0 !important;
         padding: 0 !important;
         border: none !important;
@@ -755,11 +755,11 @@
       }
       
       /* iPhone ensure Gallery displays normally */
-      .gallery-container {
+    .gallery-container {
         font-size: 1em !important;
-      }
-      
-      .gallery-item {
+    }
+    
+    .gallery-item {
         font-size: 1em !important;
       }
       
@@ -769,9 +769,9 @@
       
       .gallery-item h4 {
         font-size: 1em !important;
-      }
-      
-      .gallery-item p {
+    }
+    
+    .gallery-item p {
         font-size: 1em !important;
       }
       
@@ -843,6 +843,32 @@
       }
       
       /* Video playback optimization */
+      video {
+        transition: opacity 0.3s ease;
+        background: #000;
+      }
+      
+      video:not([src]) {
+        background: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      }
+      
+      video:not([src])::before {
+        content: "Loading...";
+        color: #666;
+        font-family: 'Google Sans', sans-serif;
+      }
+      
+      .video-error {
+        animation: fadeIn 0.3s ease;
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
       video {
         -webkit-playsinline: true;
       }
@@ -1372,6 +1398,14 @@
       
       // Update dot status
       updateDots();
+      
+      // Auto-play the newly visible video after gallery movement
+      setTimeout(() => {
+        const visibleVideo = container.querySelector('.gallery-item:nth-child(' + (currentSlide + 1) + ') video');
+        if (visibleVideo && isVideoVisible(visibleVideo)) {
+          startAutoPlayForVideo(visibleVideo);
+        }
+      }, 300); // Wait for transition to complete
     }
     
       // Goal Reaching video gallery control
@@ -1396,6 +1430,14 @@
       
       // Update dot status
       updateGoalDots();
+      
+      // Auto-play the newly visible video after gallery movement
+      setTimeout(() => {
+        const visibleVideo = container.querySelector('.gallery-item:nth-child(' + (currentGoalSlide + 1) + ') video');
+        if (visibleVideo && isVideoVisible(visibleVideo)) {
+          startAutoPlayForVideo(visibleVideo);
+        }
+      }, 300); // Wait for transition to complete
     }
     
     function goToSlide(slideIndex) {
@@ -1705,7 +1747,283 @@
     // Initialize video covers after page load
     document.addEventListener('DOMContentLoaded', function() {
       // No longer need complex background generation, use video directly as background
+      
+      // Initialize video lazy loading and error handling
+      initializeVideoOptimization();
     });
+    
+    // Video optimization functions
+    function initializeVideoOptimization() {
+      // Set up smart Intersection Observer for optimized loading
+      const videoObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          const video = entry.target;
+          if (entry.isIntersecting) {
+            // Video is entering viewport
+            if (video.dataset.src && !video.src) {
+              video.src = video.dataset.src;
+              video.load();
+            }
+            
+            // Set higher priority for visible videos
+            video.preload = 'auto';
+            
+            // Start auto-play if it's a gallery video
+            if (video.closest('.gallery-item')) {
+              setTimeout(() => {
+                if (isVideoVisible(video)) {
+                  startAutoPlayForVideo(video);
+                }
+              }, 100);
+            }
+          } else {
+            // Video is leaving viewport
+            if (video.closest('.gallery-item')) {
+              pauseVideoForOptimization(video);
+            }
+            
+            // Reduce priority for non-visible videos
+            video.preload = 'metadata';
+          }
+        });
+      }, {
+        rootMargin: '200px' // Larger margin for better UX
+      });
+      
+      // Smart auto-play system for all gallery videos with optimized loading
+      function initializeGalleryAutoPlay() {
+        // Initialize both Motion Tracking and Goal Reaching galleries
+        document.querySelectorAll('.gallery-item video').forEach((video, index) => {
+          // Set up smart loading and auto-play
+          video.addEventListener('loadeddata', function() {
+            if (!this.hasAttribute('data-initialized')) {
+              this.setAttribute('data-initialized', 'true');
+              
+              // Auto-play ready, no need for play button
+              
+              // Start auto-play for visible videos
+              if (isVideoVisible(this)) {
+                startAutoPlayForVideo(this);
+              }
+            }
+          });
+          
+          // Click to toggle play/pause (no visual button needed)
+          video.addEventListener('click', function() {
+            if (this.paused) {
+              this.play().catch(e => console.log('Play failed:', e));
+            } else {
+              this.pause();
+            }
+          });
+          
+          // Loop handling
+          video.addEventListener('ended', function() {
+            this.currentTime = 0;
+            this.play().catch(e => console.log('Loop play failed:', e));
+          });
+          
+          // Add play/pause indicator
+          video.style.cursor = 'pointer';
+          video.title = 'Click to play/pause';
+        });
+      }
+      
+      // Initialize gallery auto-play
+      initializeGalleryAutoPlay();
+      
+      
+      // Function to check if video is visible
+      function isVideoVisible(video) {
+        const rect = video.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        return rect.top < windowHeight && rect.bottom > 0;
+      }
+      
+      // Function to start auto-play for a video
+      function startAutoPlayForVideo(video) {
+        if (!video.hasAttribute('data-auto-playing')) {
+          video.setAttribute('data-auto-playing', 'true');
+          video.play().catch(e => {
+            console.log('Auto-play failed:', e);
+          });
+        }
+      }
+      
+      // Function to pause video for optimization
+      function pauseVideoForOptimization(video) {
+        if (video.hasAttribute('data-auto-playing')) {
+          video.pause();
+          video.removeAttribute('data-auto-playing');
+        }
+      }
+      
+      
+      // Performance monitoring and adaptive loading
+      let performanceMetrics = {
+        loadingVideos: 0,
+        maxConcurrentLoads: 3,
+        networkSpeed: 'unknown'
+      };
+      
+      // Monitor network speed
+      if ('connection' in navigator) {
+        const connection = navigator.connection;
+        performanceMetrics.networkSpeed = connection.effectiveType || 'unknown';
+        
+        // Adjust max concurrent loads based on network speed
+        if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
+          performanceMetrics.maxConcurrentLoads = 1;
+        } else if (connection.effectiveType === '3g') {
+          performanceMetrics.maxConcurrentLoads = 2;
+        } else {
+          performanceMetrics.maxConcurrentLoads = 3;
+        }
+      }
+      
+      // Queue system for video loading
+      const videoLoadQueue = [];
+      let currentlyLoading = 0;
+      
+      function processVideoQueue() {
+        if (currentlyLoading < performanceMetrics.maxConcurrentLoads && videoLoadQueue.length > 0) {
+          const video = videoLoadQueue.shift();
+          currentlyLoading++;
+          
+          video.addEventListener('loadeddata', () => {
+            currentlyLoading--;
+            processVideoQueue();
+          }, { once: true });
+          
+          video.addEventListener('error', () => {
+            currentlyLoading--;
+            processVideoQueue();
+          }, { once: true });
+          
+          if (video.dataset.src && !video.src) {
+            video.src = video.dataset.src;
+            video.load();
+          }
+        }
+      }
+      
+      // Enhanced Intersection Observer with queue management
+      const enhancedVideoObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          const video = entry.target;
+          if (entry.isIntersecting) {
+            // Add to loading queue instead of immediate loading
+            if (video.dataset.src && !video.src && !videoLoadQueue.includes(video)) {
+              videoLoadQueue.push(video);
+              processVideoQueue();
+            }
+            
+            // Set higher priority for visible videos
+            video.preload = 'auto';
+            
+            // Start auto-play if it's a gallery video (both Motion Tracking and Goal Reaching)
+            if (video.closest('.gallery-item')) {
+              setTimeout(() => {
+                if (isVideoVisible(video)) {
+                  startAutoPlayForVideo(video);
+                }
+              }, 200);
+            }
+          } else {
+            // Video is leaving viewport
+            if (video.closest('.gallery-item')) {
+              pauseVideoForOptimization(video);
+            }
+            
+            // Reduce priority for non-visible videos
+            video.preload = 'metadata';
+            
+            // Remove from queue if not loaded yet
+            const queueIndex = videoLoadQueue.indexOf(video);
+            if (queueIndex > -1) {
+              videoLoadQueue.splice(queueIndex, 1);
+            }
+          }
+        });
+      }, {
+        rootMargin: '150px'
+      });
+      
+      // Observe all videos with data-src attribute
+      document.querySelectorAll('video[data-src]').forEach(video => {
+        enhancedVideoObserver.observe(video);
+      });
+      
+      // Add error handling to all videos
+      document.querySelectorAll('video').forEach(video => {
+        video.addEventListener('error', function(e) {
+          console.warn('Video loading error:', this.src);
+          this.style.display = 'none';
+          
+          // Show error message
+          const errorDiv = document.createElement('div');
+          errorDiv.className = 'video-error';
+          errorDiv.innerHTML = `
+            <div style="
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              height: 200px;
+              background: #f5f5f5;
+              border: 2px dashed #ccc;
+              border-radius: 8px;
+              color: #666;
+              font-family: 'Google Sans', sans-serif;
+            ">
+              <div style="text-align: center;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2em; margin-bottom: 10px; color: #ff6b6b;"></i>
+                <div>Video failed to load</div>
+                <button onclick="retryVideoLoad(this)" style="
+                  margin-top: 10px;
+                  padding: 5px 15px;
+                  background: #004bb3;
+                  color: white;
+                  border: none;
+                  border-radius: 4px;
+                  cursor: pointer;
+                ">Retry</button>
+              </div>
+            </div>
+          `;
+          
+          this.parentNode.insertBefore(errorDiv, this);
+        });
+        
+        video.addEventListener('loadstart', function() {
+          this.style.opacity = '0.7';
+        });
+        
+        video.addEventListener('canplay', function() {
+          this.style.opacity = '1';
+        });
+        
+        video.addEventListener('waiting', function() {
+          this.style.opacity = '0.7';
+        });
+        
+        video.addEventListener('playing', function() {
+          this.style.opacity = '1';
+        });
+      });
+    }
+    
+    // Retry video loading function
+    function retryVideoLoad(button) {
+      const errorDiv = button.closest('.video-error');
+      const video = errorDiv.nextElementSibling;
+      
+      if (video && video.tagName === 'VIDEO') {
+        errorDiv.remove();
+        video.style.display = 'block';
+        video.load();
+        video.play().catch(e => console.log('Retry play failed:', e));
+      }
+    }
 
     // Initialize video cover function (simplified)
     function initializeVideoCovers() {
@@ -2142,7 +2460,7 @@
       <div class="gallery-container" id="goalGalleryContainer">
         <!-- Video item 2 - Any-to-Target 2 -->
         <div class="gallery-item">
-          <video muted playsinline autoplay loop>
+          <video muted playsinline loop preload="metadata">
             <source src="./resources/goal_reaching/ANY2T/any2T/any2T-2.mp4" type="video/mp4">
             Your browser does not support the video tag.
           </video>
@@ -2154,7 +2472,7 @@
 
         <!-- Video item 1 - Any-to-Target 1 -->
         <div class="gallery-item">
-          <video muted playsinline autoplay loop>
+          <video muted playsinline loop preload="metadata">
             <source src="./resources/goal_reaching/ANY2T/any2T/any2T-1.mp4" type="video/mp4">
             Your browser does not support the video tag.
           </video>
@@ -2166,7 +2484,7 @@
 
         <!-- Video item 3 - Any-to-Pose 1 -->
         <div class="gallery-item">
-          <video muted playsinline autoplay loop>
+          <video muted playsinline loop preload="metadata">
             <source src="./resources/goal_reaching/any2pose/any2pose-4.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -2178,7 +2496,7 @@
 
         <!-- Video item 4 - Any-to-Pose 2 -->
         <div class="gallery-item">
-          <video muted playsinline autoplay loop>
+          <video muted playsinline loop preload="metadata">
             <source src="./resources/goal_reaching/any2pose/any2pose-2.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -2190,7 +2508,7 @@
         
         <!-- Video item 5 - Any-to-Pose 3 -->
         <div class="gallery-item">
-          <video muted playsinline autoplay loop>
+          <video muted playsinline loop preload="metadata">
             <source src="./resources/goal_reaching/any2pose/any2pose-7.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -2202,7 +2520,7 @@
         
         <!-- Video item 6 - Any-to-Pose 4 -->
         <div class="gallery-item">
-          <video muted playsinline autoplay loop>
+          <video muted playsinline loop preload="metadata">
             <source src="./resources/goal_reaching/any2pose/any2pose-3.mp4" type="video/mp4">
             Your browser does not support the video tag.
           </video>
@@ -2214,7 +2532,7 @@
         
         <!-- Video item 7 - Any-to-Pose 5 -->
         <div class="gallery-item">
-          <video muted playsinline autoplay loop>
+          <video muted playsinline loop preload="metadata">
             <source src="./resources/goal_reaching/any2pose/any2pose-5.mp4" type="video/mp4">
             Your browser does not support the video tag.
           </video>
@@ -2226,7 +2544,7 @@
         
         <!-- Video item 8 - Any-to-Pose 6 -->
         <div class="gallery-item">
-          <video muted playsinline autoplay loop>
+          <video muted playsinline loop preload="metadata">
             <source src="./resources/goal_reaching/any2pose/any2pose-1.mp4" type="video/mp4">
             Your browser does not support the video tag.
           </video>
@@ -2238,7 +2556,7 @@
         
         <!-- Video item 9 - Any-to-Pose 7 -->
         <div class="gallery-item">
-          <video muted playsinline autoplay loop>
+          <video muted playsinline loop preload="metadata">
             <source src="./resources/goal_reaching/any2pose/any2pose-6.mp4" type="video/mp4">
             Your browser does not support the video tag.
           </video>
@@ -2249,7 +2567,7 @@
       </div>
       
       <div class="gallery-item">
-        <video muted playsinline autoplay loop>
+        <video muted playsinline loop preload="metadata">
           <source src="./resources/goal_reaching/any2pose/robust-1.mp4" type="video/mp4">
           Your browser does not support the video tag.
         </video>
@@ -2314,7 +2632,7 @@
       <div class="gallery-container" id="galleryContainer">
         <!-- Video item 1 - Segment 5 (Walk and Turn) -->
         <div class="gallery-item">
-          <video muted playsinline autoplay loop>
+          <video muted playsinline loop preload="metadata">
             <source src="./resources/tracking/segment/seg5.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -2325,7 +2643,7 @@
     
         <!-- Video item 2 - Segment 2 (Ball Games) -->
         <div class="gallery-item">
-          <video muted playsinline autoplay loop>
+          <video muted playsinline loop preload="metadata">
             <source src="./resources/tracking/segment/seg2.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -2336,7 +2654,7 @@
 
         <!-- Video item 3 - Segment 7 (Dancing with Fall and Recovery) -->
         <div class="gallery-item">
-          <video muted playsinline autoplay loop>
+          <video muted playsinline loop preload="metadata">
             <source src="./resources/tracking/segment/seg7.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -2347,7 +2665,7 @@
         
         <!-- Video item 4 - Segment 6 (Styled Walking with Salute) -->
         <div class="gallery-item">
-          <video muted playsinline autoplay loop>
+          <video muted playsinline loop preload="metadata">
             <source src="./resources/tracking/segment/seg6.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -2358,7 +2676,7 @@
     
         <!-- Video item 5 - Segment 3 (Boxing) -->
         <div class="gallery-item">
-          <video muted playsinline autoplay loop>
+          <video muted playsinline loop preload="metadata">
             <source src="./resources/tracking/segment/seg3.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -2369,7 +2687,7 @@
         
         <!-- Video item 6 - Segment 4 (Walking with Different Steps) -->
         <div class="gallery-item">
-          <video muted playsinline autoplay loop>
+          <video muted playsinline loop preload="metadata">
             <source src="./resources/tracking/segment/seg4.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -2380,7 +2698,7 @@
 
         <!-- Video item 7 - Segment 1 (Dancing) -->
         <div class="gallery-item">
-          <video muted playsinline autoplay loop>
+          <video muted playsinline loop preload="metadata">
             <source src="./resources/tracking/segment/seg1.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
