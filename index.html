@@ -1138,27 +1138,51 @@
   <script src="./static/js/index.js" defer></script>
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
 
-  <!-- KaTeX for math rendering -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+  <!-- KaTeX for math rendering - will be loaded after hero video -->
+  <!-- Note: KaTeX loading is deferred until hero video is ready -->
   
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // KaTeX math rendering
-      if (typeof renderMathInElement !== 'undefined') {
-        renderMathInElement(document.body, {
-          delimiters: [
-            {left: '$$', right: '$$', display: true},
-            {left: '$', right: '$', display: false},
-            {left: '\\[', right: '\\]', display: true},
-            {left: '\\(', right: '\\)', display: false}
-          ]
-        });
-      }
-      
-      // Global flag to track hero video loading completion
+    // IMMEDIATE: Block all non-hero videos before DOMContentLoaded
+    // This prevents browsers from starting to load videos with preload="metadata"
+    (function() {
       window.heroVideoLoaded = false;
+      
+      // Block all videos immediately (before DOM is ready)
+      const blockAllVideos = () => {
+        const allVideos = document.querySelectorAll('video');
+        allVideos.forEach(video => {
+          // Skip hero videos
+          if (video.id === 'hero-video-main' || video.id === 'hero-video-mobile') {
+            return;
+          }
+          
+          // Immediately set preload to none and pause any loading
+          video.preload = 'none';
+          video.pause();
+          // Remove src temporarily to prevent loading
+          if (video.src) {
+            video.setAttribute('data-temp-src', video.src);
+            video.removeAttribute('src');
+          }
+          const source = video.querySelector('source');
+          if (source && source.src) {
+            source.setAttribute('data-temp-src', source.src);
+            source.removeAttribute('src');
+          }
+        });
+      };
+      
+      // Try to block immediately if DOM is already loaded
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', blockAllVideos);
+      } else {
+        blockAllVideos();
+      }
+    })();
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      // KaTeX math rendering will be initialized after hero video loads
+      // (see loadKaTeXAfterHeroVideo function below)
       
       // Hero video fade-in when ready - PROGRESSIVE LOADING
       const heroVideoMain = document.getElementById('hero-video-main');
@@ -1245,16 +1269,91 @@
         showHeroVideo(heroVideoMobile);
       }
       
-      // Block all other videos from loading until hero video is ready
-      const otherVideos = document.querySelectorAll('video:not(#hero-video-main):not(#hero-video-mobile)');
-      otherVideos.forEach(video => {
-        // Set preload to none to prevent any loading
-        if (video.readyState === 0) {
-          video.preload = 'none';
-          video.load(); // Apply preload="none"
-        }
-      });
-      console.log(`🚫 Blocked ${otherVideos.length} videos from loading until hero video is ready`);
+      // Restore video sources when hero video is ready
+      const restoreVideoSources = () => {
+        const otherVideos = document.querySelectorAll('video:not(#hero-video-main):not(#hero-video-mobile)');
+        otherVideos.forEach(video => {
+          // Restore src if it was temporarily removed
+          if (video.hasAttribute('data-temp-src')) {
+            video.src = video.getAttribute('data-temp-src');
+            video.removeAttribute('data-temp-src');
+          }
+          const source = video.querySelector('source');
+          if (source && source.hasAttribute('data-temp-src')) {
+            source.src = source.getAttribute('data-temp-src');
+            source.removeAttribute('data-temp-src');
+          }
+          // Set appropriate preload value
+          video.preload = 'metadata';
+        });
+        console.log(`✅ Restored ${otherVideos.length} videos - ready to load after hero video`);
+      };
+      
+      // Wait for hero video to load, then restore sources and load KaTeX
+      const loadKaTeXAfterHeroVideo = () => {
+        // Restore video sources
+        restoreVideoSources();
+        
+        // Load KaTeX after hero video is ready
+        console.log('📚 Loading KaTeX after hero video is ready...');
+        
+        // Preload critical KaTeX fonts
+        const katexFonts = [
+          'https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/fonts/KaTeX_Main-Regular.woff2',
+          'https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/fonts/KaTeX_Math-Italic.woff2',
+          'https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/fonts/KaTeX_Math-BoldItalic.woff2',
+          'https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/fonts/KaTeX_Size2-Regular.woff2'
+        ];
+        
+        katexFonts.forEach(fontUrl => {
+          const link = document.createElement('link');
+          link.rel = 'preload';
+          link.href = fontUrl;
+          link.as = 'font';
+          link.type = 'font/woff2';
+          link.crossOrigin = 'anonymous';
+          document.head.appendChild(link);
+        });
+        
+        // Load KaTeX CSS
+        const katexCSS = document.createElement('link');
+        katexCSS.rel = 'stylesheet';
+        katexCSS.href = 'https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css';
+        document.head.appendChild(katexCSS);
+        
+        // Load KaTeX JS
+        const katexJS = document.createElement('script');
+        katexJS.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js';
+        katexJS.defer = true;
+        katexJS.onload = function() {
+          // Load auto-render after main KaTeX is loaded
+          const autoRenderJS = document.createElement('script');
+          autoRenderJS.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js';
+          autoRenderJS.defer = true;
+          autoRenderJS.onload = function() {
+            // Initialize KaTeX rendering after both scripts are loaded
+            if (typeof renderMathInElement !== 'undefined') {
+              renderMathInElement(document.body, {
+                delimiters: [
+                  {left: '$$', right: '$$', display: true},
+                  {left: '$', right: '$', display: false},
+                  {left: '\\[', right: '\\]', display: true},
+                  {left: '\\(', right: '\\)', display: false}
+                ]
+              });
+              console.log('✅ KaTeX loaded and initialized');
+            }
+          };
+          document.head.appendChild(autoRenderJS);
+        };
+        document.head.appendChild(katexJS);
+      };
+      
+      if (window.heroVideoLoaded) {
+        loadKaTeXAfterHeroVideo();
+      } else {
+        window.addEventListener('heroVideoLoaded', loadKaTeXAfterHeroVideo, { once: true });
+      }
     });
   </script>
     
