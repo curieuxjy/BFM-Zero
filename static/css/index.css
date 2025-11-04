@@ -954,6 +954,28 @@ body {
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
 
+/* Fix deprecation warning for slider-vertical */
+input[type="range"].slider[orient="vertical"],
+input[type="range"].slider.slider-vertical {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+input[type="range"].slider[orient="vertical"]::-webkit-slider-thumb,
+input[type="range"].slider.slider-vertical::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="range"].slider[orient="vertical"]::-moz-range-thumb,
+input[type="range"].slider.slider-vertical::-moz-range-thumb {
+  -moz-appearance: none;
+  appearance: none;
+}
+
 .timeline-marks {
   position: relative;
   height: 120px;
