@@ -2776,20 +2776,61 @@
       const video = videoContainer.querySelector('video[style*="display: none"]'); // Select hidden playback video
       const cover = videoContainer.querySelector('.video-cover');
       
+      if (!video) {
+        console.error('Video element not found');
+        return;
+      }
+      
+      // Restore src if video was blocked
+      if (video.hasAttribute('data-temp-src') && !video.src) {
+        video.src = video.getAttribute('data-temp-src');
+        video.removeAttribute('data-temp-src');
+        video.load();
+      }
+      
+      // Check source element as well
+      const source = video.querySelector('source');
+      if (source && source.hasAttribute('data-temp-src') && !source.src) {
+        source.src = source.getAttribute('data-temp-src');
+        source.removeAttribute('data-temp-src');
+        video.load();
+      }
+      
+      // Set preload to auto and ensure video is ready
+      if (video.preload === 'none') {
+        video.preload = 'auto';
+      }
+      
       // Hide cover, show video
       cover.style.display = 'none';
       video.style.display = 'block';
       
-      // Play video
-      video.currentTime = 0;
-      video.play();
+      // Wait for video to be ready before playing
+      const playVideoWhenReady = () => {
+        if (video.readyState >= 2) { // HAVE_CURRENT_DATA
+          video.currentTime = 0;
+          video.play().catch(err => {
+            console.error('Error playing video:', err);
+          });
+        } else {
+          video.addEventListener('loadeddata', () => {
+            video.currentTime = 0;
+            video.play().catch(err => {
+              console.error('Error playing video:', err);
+            });
+          }, { once: true });
+          video.load();
+        }
+      };
+      
+      playVideoWhenReady();
       
       // Listen to video end event
       video.addEventListener('ended', function() {
         // After video ends, return to cover
         video.style.display = 'none';
         cover.style.display = 'block';
-      });
+      }, { once: true });
     }
 
       // Performance monitoring object
@@ -3561,7 +3602,7 @@
                 <!-- PDF Link. -->
                 <span class="link-block">
                   <!-- TODO:update -->
-                  <a href="./static/images/meta.png"
+                  <a href="./resources/paper.pdf"
                      class="external-link button is-normal is-rounded is-dark" target="_blank">
                     <span class="icon">
                         <i class="fas fa-file-pdf"></i>
@@ -3580,15 +3621,15 @@
                     <span>ArXiv</span>
                   </a>
                 </span>
-                <!-- <span class="link-block">
-                  <a href="https://lecar-lab.github.io/SoFTA/"
+                <span class="link-block">
+                  <a href="./static/images/meta.png"
                      class="external-link button is-normal is-rounded is-dark" target="_blank">
                     <span class="icon">
                         <i class="fab fa-youtube"></i>
                     </span>
                     <span>Video</span>
                   </a>
-                </span> -->
+                </span>
                 <!-- Datasets Link. -->
                 <!-- <span class="link-block">
                   <a href="https://cmu.box.com/s/kmayzq5ax2rxvwn97s0hzz0aq5vws9io" class="external-link button is-normal is-rounded is-dark" target="_blank">
@@ -3606,7 +3647,7 @@
                     <span class="icon">
                         <i class="fab fa-twitter"></i>
                     </span>
-                    <span>Summary (Coming Soon)</span>
+                    <span>Summary</span>
                   </a>
                 </span>
                 <!-- Code Link. -->
