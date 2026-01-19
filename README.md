@@ -13,7 +13,7 @@
 <img src="static/images/meta.png" style="height:50px;" />
 </div>
 
-# Code
+## Code
 Code will be released in stages:
 
 - [x] Release pretrained checkpoints and sim-to-sim / sim-to-real deployment code. (Checkout `deploy` branch)
@@ -21,11 +21,11 @@ Code will be released in stages:
 - [ ] Release minimal training code with RTX 4090 support.
 - [ ] Release full training and evaluation pipelines.
 
-# License
+## License
 
 BFM-Zero is licensed under the CC BY-NC 4.0 license. See [LICENSE](LICENSE) for details.
 
-# Citation
+## Citation
 
 If you find this project useful in your research, please consider citing:
 
@@ -52,3 +52,8 @@ Wrong arXiv id here!!
       url={https://arxiv.org/abs/2511.04131}, 
 }
 ```
+
+## Contact
+
+If you have any problems, please contact [liyitang475@gmail.com](mailto:liyitang475@gmail.com).
+
