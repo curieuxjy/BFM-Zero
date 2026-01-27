@@ -18,10 +18,10 @@
 Code will be released in stages:
 
 - [x] **Pretrained checkpoints + sim-to-sim / sim-to-real deployment**  
-  → `deploy` branch
+  → [`deploy`](https://github.com/LeCAR-Lab/BFM-Zero/tree/deploy) branch
 
 - [x] **Minimal inference code + tutorial**  
-  → `minimal_inference` branch
+  → [`minimal_inference`](https://github.com/LeCAR-Lab/BFM-Zero/tree/minimal_inference) branch
 
 - [ ] **Minimal training code (RTX 4090 support)**
 
