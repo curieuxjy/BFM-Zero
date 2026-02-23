@@ -2,15 +2,19 @@
 macOS용 tracking inference 스크립트
 
 사용법:
+    # GUI 모드 (cv2 뷰어 사용, mjpython 불필요):
     uv run python study/scripts/tracking_inference_macos.py --model_folder model/
-    uv run python study/scripts/tracking_inference_macos.py --model_folder model/ --no-headless
+
+    # Headless 모드:
+    uv run python study/scripts/tracking_inference_macos.py --model_folder model/ --headless
 
 이 스크립트는 메인 소스코드를 수정하지 않고 런타임 패치를 적용합니다.
 """
 import os
 import sys
 
-# macOS에서는 glfw 사용 (egl은 Linux 전용)
+# offscreen 렌더링 사용 (osmesa는 macOS/Linux 모두 지원)
+# glfw는 메인스레드 제약이 있어 launch_passive에서 문제 발생
 if sys.platform == "darwin":
     os.environ["MUJOCO_GL"] = "glfw"
 else:
@@ -23,9 +27,37 @@ from pathlib import Path
 # study 폴더를 path에 추가
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-# 패치 적용 (humanoidverse import 전에)
-from study.patches.config_patch import apply_config_patches
-apply_config_patches()
+# MuJoCo 패치 적용 (환경 빌드 전에 먼저 import 후 패치)
+# 이 패치는 quat_rotate 함수 호출 시 w_last=True 인자를 추가합니다
+from humanoidverse.simulator.mujoco import mujoco as mujoco_module
+from humanoidverse.utils.torch_utils import quat_rotate
+import torch
+
+MuJoCoClass = mujoco_module.MuJoCo
+
+def _patched_robot_root_states(self):
+    base_quat = self.base_quat
+    qvel_tensor = torch.tensor([self.data.qvel[0:6]], device=self.device, dtype=torch.float32)
+    return torch.cat([
+        torch.tensor([self.data.qpos[0:3]], device=self.device, dtype=torch.float32),
+        base_quat,
+        qvel_tensor[:, 0:3],
+        quat_rotate(base_quat, qvel_tensor[:, 3:6], w_last=True),
+    ], dim=-1)
+
+def _patched_all_root_states(self):
+    base_quat = self.base_quat
+    qvel_tensor = torch.tensor([self.data.qvel[0:6]], device=self.device, dtype=torch.float32)
+    return torch.cat([
+        torch.tensor([self.data.qpos[0:3]], device=self.device, dtype=torch.float32),
+        base_quat,
+        qvel_tensor[:, 0:3],
+        quat_rotate(base_quat, qvel_tensor[:, 3:6], w_last=True),
+    ], dim=-1)
+
+MuJoCoClass.robot_root_states = property(_patched_robot_root_states)
+MuJoCoClass.all_root_states = property(_patched_all_root_states)
+print("[patch] MuJoCo quat_rotate w_last 패치 적용됨")
 
 from humanoidverse.agents.load_utils import load_model_from_checkpoint_dir
 import json
@@ -38,8 +70,8 @@ import mediapy as media
 import numpy as np
 from torch.utils._pytree import tree_map
 import mujoco
-import mujoco.viewer
 import time
+import cv2
 
 import humanoidverse
 if getattr(humanoidverse, "__file__", None) is not None:
@@ -51,7 +83,7 @@ else:
 def main(
     model_folder: Path,
     data_path: Path | None = None,
-    headless: bool = True,
+    headless: bool = False,
     device: str = "cpu",
     simulator: str = "mujoco",
     save_mp4: bool = False,
@@ -66,14 +98,14 @@ def main(
     Args:
         model_folder: 모델 폴더 경로 (checkpoint/ 포함)
         data_path: 모션 데이터 경로 (선택)
-        headless: GUI 없이 실행 (--no-headless로 GUI 표시)
+        headless: GUI 없이 실행 (기본값: False, GUI 표시)
         device: cpu (macOS에서는 cuda 미지원)
         simulator: mujoco (macOS에서는 isaacsim 미지원)
         save_mp4: 비디오 저장 여부
         disable_dr: domain randomization 비활성화
         disable_obs_noise: observation noise 비활성화
         motion_list: 평가할 모션 ID 리스트
-        num_steps: 시뮬레이션 스텝 수
+        num_steps: 시뮬레이션 스텝 수 (headless 모드에서 사용)
     """
     model_folder = Path(model_folder)
 
@@ -121,12 +153,6 @@ def main(
     print("Building environment...")
     num_envs = 1
     env_cfg = HumanoidVerseIsaacConfig(**config["env"])
-
-    # MuJoCo 패치 적용 (환경 빌드 전에 - MuJoCo 클래스가 로드된 후 인스턴스화 전에)
-    # HumanoidVerseIsaacConfig import 시 MuJoCo 모듈이 로드되므로 이 시점에 패치 가능
-    from study.patches.mujoco_patch import apply_mujoco_patches
-    apply_mujoco_patches()
-
     wrapped_env, _ = env_cfg.build(num_envs)
 
     env = wrapped_env._env
@@ -148,19 +174,128 @@ def main(
 
     if not headless:
         print("\n" + "="*60)
-        print("Launching MuJoCo viewer...")
-        print("Close the window to exit.")
+        print("Launching MuJoCo viewer with policy control...")
+        print("Press 'q' or ESC to exit.")
         print("="*60 + "\n")
 
+        # 모션 설정 및 z 계산
+        MOTION_ID = motion_list[0]
+        print(f"Motion ID: {MOTION_ID}")
+        env.set_is_evaluating(MOTION_ID)
+
+        obs, obs_dict = get_backward_observation(env, 0, use_root_height_obs=use_root_height_obs)
+
+        with torch.no_grad():
+            z = tracking_inference(obs)
+        print(f"Computed z shape: {z.shape}")
+
+        # === 참조 모션 qpos 시퀀스 미리 계산 ===
+        # 모션 라이브러리에서 각 프레임의 root_pos, root_rot, dof_pos 추출
+        ref_root_pos = obs_dict["ref_body_pos"][:, 0].cpu().numpy()    # [T, 3]
+        ref_root_rot = obs_dict["ref_body_rots"][:, 0].cpu().numpy()   # [T, 4] xyzw
+        ref_dof_pos = obs_dict["dof_pos"].cpu().numpy()                 # [T, 29]
+
+        # MuJoCo qpos 구성: [root_pos(3), root_quat_wxyz(4), dof_pos(29)] = 36
+        # 쿼터니언 변환: xyzw -> wxyz (MuJoCo 포맷)
+        ref_root_rot_wxyz = np.roll(ref_root_rot, 1, axis=-1)  # [x,y,z,w] -> [w,x,y,z]
+        ref_qpos_seq = np.concatenate([ref_root_pos, ref_root_rot_wxyz, ref_dof_pos], axis=-1)  # [T, 36]
+        total_ref_frames = len(ref_qpos_seq)
+        print(f"Reference motion: {total_ref_frames} frames, qpos shape: {ref_qpos_seq.shape}")
+
         # 환경 리셋
-        obs, _ = wrapped_env.reset()
+        wrapped_obs, _ = wrapped_env.reset(to_numpy=False)
 
-        # GUI 모드: mujoco.viewer.launch 사용
-        def controller(model, data):
-            """뷰어에서 호출되는 컨트롤러"""
-            pass  # 시뮬레이션은 환경에서 처리
+        # GUI 모드: offscreen 렌더링 + cv2 뷰어 (mjpython 불필요)
+        RENDER_W, RENDER_H = 640, 480
+        mj_model.vis.global_.offwidth = RENDER_W
+        mj_model.vis.global_.offheight = RENDER_H
 
-        mujoco.viewer.launch(mj_model, mj_data)
+        # 실제 로봇 렌더러
+        renderer = mujoco.Renderer(mj_model, height=RENDER_H, width=RENDER_W)
+
+        # 참조 모션 렌더러 (같은 모델의 별도 data 인스턴스)
+        ref_mj_data = mujoco.MjData(mj_model)
+        ref_renderer = mujoco.Renderer(mj_model, height=RENDER_H, width=RENDER_W)
+
+        # 카메라 설정
+        cam = mujoco.MjvCamera()
+        cam.type = mujoco.mjtCamera.mjCAMERA_FREE
+        cam.distance = 4.0
+        cam.azimuth = 90
+        cam.elevation = -20
+        cam.lookat[:] = [0, 0, 0.8]
+
+        ref_cam = mujoco.MjvCamera()
+        ref_cam.type = mujoco.mjtCamera.mjCAMERA_FREE
+        ref_cam.distance = 4.0
+        ref_cam.azimuth = 90
+        ref_cam.elevation = -20
+        ref_cam.lookat[:] = [0, 0, 0.8]
+
+        step_counter = 0
+        cv2.namedWindow("Tracking Inference (Left: Reference | Right: Policy)", cv2.WINDOW_NORMAL)
+
+        while True:
+            # 정책으로 액션 계산
+            with torch.no_grad():
+                z_current = z[step_counter % len(z)].unsqueeze(0)
+                action = model.act(wrapped_obs, z_current, mean=True)
+
+            # 환경 스텝
+            wrapped_obs, reward, terminated, truncated, info = wrapped_env.step(action, to_numpy=False)
+
+            # === 참조 모션 렌더링 (왼쪽) ===
+            ref_frame_idx = step_counter % total_ref_frames
+            ref_qpos = ref_qpos_seq[ref_frame_idx]
+            ref_mj_data.qpos[:] = ref_qpos
+            ref_mj_data.qvel[:] = 0  # 속도는 0으로 설정
+            mujoco.mj_forward(mj_model, ref_mj_data)  # FK 계산
+
+            ref_cam.lookat[:] = ref_mj_data.qpos[:3]
+            ref_cam.lookat[2] = 0.8
+            ref_renderer.update_scene(ref_mj_data, camera=ref_cam)
+            ref_frame = ref_renderer.render()
+
+            # === 실제 로봇 렌더링 (오른쪽) ===
+            cam.lookat[:] = mj_data.qpos[:3]
+            cam.lookat[2] = 0.8
+            renderer.update_scene(mj_data, camera=cam)
+            policy_frame = renderer.render()
+
+            # 텍스트 오버레이
+            ref_frame_bgr = cv2.cvtColor(ref_frame, cv2.COLOR_RGB2BGR)
+            policy_frame_bgr = cv2.cvtColor(policy_frame, cv2.COLOR_RGB2BGR)
+
+            cv2.putText(ref_frame_bgr, "Reference Motion", (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 200, 255), 2)
+            cv2.putText(ref_frame_bgr, f"Frame {ref_frame_idx}/{total_ref_frames}", (10, 60),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 200, 255), 1)
+
+            cv2.putText(policy_frame_bgr, "Policy Output", (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+            cv2.putText(policy_frame_bgr, f"Step {step_counter}", (10, 60),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 1)
+
+            # 좌우로 합치기
+            combined = np.hstack([ref_frame_bgr, policy_frame_bgr])
+            cv2.imshow("Tracking Inference (Left: Reference | Right: Policy)", combined)
+
+            step_counter += 1
+
+            # 에피소드 종료 시 리셋
+            if terminated or truncated:
+                wrapped_obs, _ = wrapped_env.reset(to_numpy=False)
+                step_counter = 0
+
+            # 키 입력 확인 (50Hz, 20ms 대기)
+            key = cv2.waitKey(20) & 0xFF
+            if key == ord('q') or key == 27:  # 'q' 또는 ESC
+                break
+
+        cv2.destroyAllWindows()
+        renderer.close()
+        ref_renderer.close()
+        print(f"\nViewer closed after {step_counter} steps")
 
     else:
         # Headless 모드: 추론 실행
