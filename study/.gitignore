@@ -1,0 +1,15 @@
+# Study folder gitignore
+
+# 실험 결과물
+experiments/outputs/
+experiments/*.onnx
+experiments/*.pkl
+experiments/*.mp4
+
+# 임시 파일
+*.pyc
+__pycache__/
+.ipynb_checkpoints/
+
+# 개인 메모 (선택적으로 추가)
+# notes/private/
