@@ -368,3 +368,12 @@ BFM-Zero의 학습은 다음 핵심 요소로 구성됩니다:
 3. **Mixed Z Distribution**: 목표/전문가/균등 분포 혼합으로 다양한 행동 학습
 4. **Auxiliary Rewards**: 안전하고 자연스러운 동작을 위한 추가 페널티
 5. **Prioritized Sampling**: EMD 기반 어려운 모션 우선 학습
+
+---
+
+## 관련 실습 스크립트
+
+| 스크립트 | 설명 | 실행 |
+|---------|------|------|
+| `study/scripts/02_explore_train_config.py` | TrainConfig 탐색, 설정 비교, 모델 구조 확인 | `uv run python study/scripts/02_explore_train_config.py` |
+| `study/scripts/train_annotated.py` | train.py 상세 주석 버전 (읽기 전용) | — |

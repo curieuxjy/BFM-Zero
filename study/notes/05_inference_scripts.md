@@ -359,3 +359,12 @@ ONNX 모델은 로봇에 직접 배포할 수 있습니다.
 | ONNX 내보내기 | `humanoidverse/utils/helpers.py:export_meta_policy_as_onnx` |
 | 환경 래퍼 | `humanoidverse/agents/envs/humanoidverse_isaac.py` |
 
+---
+
+## 관련 실습 스크립트
+
+| 스크립트 | 설명 | 실행 |
+|---------|------|------|
+| `study/scripts/tracking_inference_macos.py` | macOS용 트래킹 추론 (참조모션 비교) | `uv run python study/scripts/tracking_inference_macos.py --model_folder model/` |
+| `study/scripts/goal_inference_macos.py` | macOS용 골 추론 | `uv run python study/scripts/goal_inference_macos.py --model_folder model/` |
+

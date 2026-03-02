@@ -572,3 +572,31 @@ uv run python study/scripts/model_architecture_compare.py
 - 환경/시뮬레이터: `study/notes/10_env_simulators.md`
 - 모션 라이브러리: `study/notes/11_motion_library.md`
 - 추론 심화: `study/notes/12_inference_advanced.md`
+
+---
+
+## 관련 실습 스크립트 전체 목록
+
+```bash
+# === 모델 불필요 (CPU 단독) ===
+uv run python study/scripts/debug_tensor_shapes.py              # 텐서 shape 추적
+uv run python study/scripts/model_architecture_compare.py       # 아키텍처 비교
+uv run python study/scripts/mujoco_viewer_test.py               # MuJoCo 렌더링 테스트
+uv run python study/scripts/02_explore_train_config.py          # train.py 구조 탐색 (step 4 제외)
+
+# === 모델 필요 ===
+uv run python study/scripts/02_explore_train_config.py --step 4                          # 모델 구성요소 확인
+uv run python study/scripts/tracking_inference_macos.py --model_folder model/            # 트래킹 추론 (참조모션 비교)
+uv run python study/scripts/goal_inference_macos.py --model_folder model/                # 골 추론
+uv run python study/scripts/analyze_z_vectors.py --model_folder model/                   # z 벡터 분석
+uv run python study/scripts/friction_experiment.py --model_folder model/                 # 마찰 계수 실험
+uv run python study/scripts/example_load_model.py --model_folder model/                  # 모델 로딩 예제
+
+# === 결과 파일 필요 ===
+uv run python study/scripts/visualize_training.py --log_dir results/bfmzero-isaac        # 학습 로그 시각화
+uv run python study/scripts/compare_reward_z.py --result_dir model/reward_inference/     # 보상 z 비교
+
+# === 읽기 전용 (참고용) ===
+# study/scripts/train_annotated.py           — train.py 상세 주석
+# study/scripts/fbcpr_algorithm_annotated.py — FB-CPR 알고리즘 상세 주석
+```

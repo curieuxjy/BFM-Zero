@@ -805,3 +805,12 @@ if self.cfg.prioritization:
 ```
 
 이 피드백 루프가 BFM-Zero의 **커리큘럼 학습**의 핵심이다. 평가 없이는 모든 모션이 균등 확률로 샘플링되어, 쉬운 모션에 학습이 편향될 수 있다.
+
+---
+
+## 관련 실습 스크립트
+
+| 스크립트 | 설명 | 실행 |
+|---------|------|------|
+| `study/scripts/visualize_training.py` | 학습 로그에서 EMD 등 메트릭 그래프 생성 | `uv run python study/scripts/visualize_training.py --log_dir results/bfmzero-isaac` |
+| `study/scripts/tracking_inference_macos.py` | 트래킹 추론으로 모션별 성능 직접 확인 | `uv run python study/scripts/tracking_inference_macos.py --model_folder model/ --motion_list 25` |

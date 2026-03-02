@@ -1015,3 +1015,13 @@ update() 호출 시:
 | Z Buffer | `humanoidverse/agents/misc/zbuffer.py` |
 | Train Loop | `humanoidverse/train.py` |
 | Evaluation (EMD) | `humanoidverse/agents/evaluations/humanoidverse_isaac.py` |
+
+---
+
+## 관련 실습 스크립트
+
+| 스크립트 | 설명 | 실행 |
+|---------|------|------|
+| `study/scripts/analyze_z_vectors.py` | 여러 모션의 z 벡터 추출 및 코사인 유사도 비교 | `uv run python study/scripts/analyze_z_vectors.py --model_folder model/` |
+| `study/scripts/debug_tensor_shapes.py` | CPU 더미 데이터로 FB 연산 텐서 shape 추적 (모델 불필요) | `uv run python study/scripts/debug_tensor_shapes.py` |
+| `study/scripts/02_explore_train_config.py --step 5` | 학습 하이퍼파라미터 상세 확인 (lr, loss 계수, z 분포) | `uv run python study/scripts/02_explore_train_config.py --step 5` |

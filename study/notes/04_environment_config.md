@@ -464,3 +464,12 @@ termination_scales:
 4. **도메인 무작위화**: Sim-to-Real 전이를 위한 다양한 변형
 5. **재현성**: seed, timestamp로 실험 추적
 
+---
+
+## 관련 실습 스크립트
+
+| 스크립트 | 설명 | 실행 |
+|---------|------|------|
+| `study/scripts/friction_experiment.py` | 마찰 계수 변경에 따른 트래킹 성능 비교 | `uv run python study/scripts/friction_experiment.py --model_folder model/` |
+| `study/scripts/mujoco_viewer_test.py` | MuJoCo 렌더링/뷰어 테스트 (모델 불필요) | `uv run python study/scripts/mujoco_viewer_test.py` |
+

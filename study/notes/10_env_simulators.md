@@ -1121,3 +1121,12 @@ Domain Randomization은 **Sim-to-Real 전이**의 핵심 기법이다:
 ```
 
 1 제어 스텝 = 4 시뮬레이션 스텝. 정책은 50Hz로 행동을 출력하고, 물리는 200Hz로 시뮬레이션된다.
+
+---
+
+## 관련 실습 스크립트
+
+| 스크립트 | 설명 | 실행 |
+|---------|------|------|
+| `study/scripts/mujoco_viewer_test.py` | MuJoCo 렌더링/뷰어 기본 테스트 (모델 불필요) | `uv run python study/scripts/mujoco_viewer_test.py` |
+| `study/scripts/friction_experiment.py` | MuJoCo geom_friction 변경 실험 | `uv run python study/scripts/friction_experiment.py --model_folder model/` |

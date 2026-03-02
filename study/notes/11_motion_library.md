@@ -984,3 +984,12 @@ new_global_rotation = quat_mul_norm(
     |
     |-- 환경에서 참조 모션과 비교 -> 보상 계산 -> 에이전트 학습
 ```
+
+---
+
+## 관련 실습 스크립트
+
+| 스크립트 | 설명 | 실행 |
+|---------|------|------|
+| `study/scripts/tracking_inference_macos.py` | 참조 모션과 정책 출력 나란히 비교 (모션 ID 변경 가능) | `uv run python study/scripts/tracking_inference_macos.py --model_folder model/ --motion_list 0` |
+| `study/scripts/analyze_z_vectors.py` | 모션별 z 벡터 추출 및 유사도 분석 | `uv run python study/scripts/analyze_z_vectors.py --model_folder model/` |

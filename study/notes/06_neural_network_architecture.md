@@ -877,3 +877,13 @@ base_model.py          nn_models.py
 ### 9.4 nn_filter_models.py의 역할
 
 `nn_filter_models.py`는 위 기본 모델들을 래핑하여 관측값의 일부 차원만 사용하는 변형을 제공한다. 설정에서 `name: "ForwardFilterArchi"` 등으로 선택하면 `FilterForwardMap(ForwardMap, filter=[0,1,2,...])` 형태로 생성된다. 이는 특정 로봇 설정에서 불필요한 센서 입력을 제거할 때 사용한다.
+
+---
+
+## 관련 실습 스크립트
+
+| 스크립트 | 설명 | 실행 |
+|---------|------|------|
+| `study/scripts/model_architecture_compare.py` | hidden_dim/layers 변경에 따른 파라미터 수·추론 속도 비교 (모델 불필요) | `uv run python study/scripts/model_architecture_compare.py` |
+| `study/scripts/debug_tensor_shapes.py` | CPU 더미 데이터로 주요 텐서 shape 추적 (모델 불필요) | `uv run python study/scripts/debug_tensor_shapes.py` |
+| `study/scripts/02_explore_train_config.py --step 4` | 체크포인트에서 모델 구성요소별 파라미터 수 확인 | `uv run python study/scripts/02_explore_train_config.py --step 4` |

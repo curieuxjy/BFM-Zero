@@ -1100,3 +1100,11 @@ class Discriminator(nn.Module):
 | ZBuffer | `misc/zbuffer.py:12-38` |
 | BaseConfig | `base.py:6-36` |
 | BaseModel | `base_model.py:74-94` |
+
+---
+
+## 관련 실습 스크립트
+
+| 스크립트 | 설명 | 실행 |
+|---------|------|------|
+| `study/scripts/fbcpr_algorithm_annotated.py` | FB-CPR 알고리즘 상세 주석 버전 (읽기 전용) | — |
