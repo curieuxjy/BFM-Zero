@@ -146,6 +146,7 @@ uv run python -m humanoidverse.reward_inference --help
 
 - `--model_folder`: Path to the trained model directory (must contain `checkpoint/` and `config.json`).
 - `--data_path` (optional): Override the default LaFan data path.
+- `--simulator`: `isaacsim` (default) or `mujoco`. **Use `--simulator mujoco` to run without Isaac Lab** (MuJoCo only; output is directly usable for sim2sim visualization).
 - `--headless` (default: `True`): Run without GUI; use `--no-headless` to show the viewer.
 - `--save_mp4`: Save rendered videos.
 
