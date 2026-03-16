@@ -610,4 +610,4 @@ def get_key(data, key):      # 중첩 키에서 값 추출
 | 스크립트 | 설명 | 실행 |
 |---------|------|------|
 | `study/scripts/debug_tensor_shapes.py` | 버퍼 저장 텐서의 shape 확인 (모델 불필요) | `uv run python study/scripts/debug_tensor_shapes.py` |
-| `study/scripts/02_explore_train_config.py --step 2` | 버퍼 크기 등 기본값 vs 실제 설정 비교 | `uv run python study/scripts/02_explore_train_config.py --step 2` |
+| `study/scripts/explore_train_config.py --step 2` | 버퍼 크기 등 기본값 vs 실제 설정 비교 | `uv run python study/scripts/explore_train_config.py --step 2` |

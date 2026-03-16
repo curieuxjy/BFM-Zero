@@ -1,17 +1,17 @@
 """
-12_compare_three_inferences.py - 3가지 Inference 모드 심층 비교
+compare_three_inferences.py - 3가지 Inference 모드 심층 비교
 
 Tracking / Goal / Reward Inference의 z 벡터 계산 방식을 비교합니다.
 실제 모델을 로드하여 각 모드의 z를 계산하고, 코사인 유사도를 분석합니다.
 
 실행:
-  uv run python study/scripts/12_compare_three_inferences.py --model_folder model/
+  uv run python study/scripts/compare_three_inferences.py --model_folder model/
 
   # 특정 스텝만
-  uv run python study/scripts/12_compare_three_inferences.py --model_folder model/ --step 1
-  uv run python study/scripts/12_compare_three_inferences.py --model_folder model/ --step 2
-  uv run python study/scripts/12_compare_three_inferences.py --model_folder model/ --step 3
-  uv run python study/scripts/12_compare_three_inferences.py --model_folder model/ --step 4
+  uv run python study/scripts/compare_three_inferences.py --model_folder model/ --step 1
+  uv run python study/scripts/compare_three_inferences.py --model_folder model/ --step 2
+  uv run python study/scripts/compare_three_inferences.py --model_folder model/ --step 3
+  uv run python study/scripts/compare_three_inferences.py --model_folder model/ --step 4
 
 Step 1: 3가지 모드의 구조 비교 (모델 불필요)
 Step 2: Tracking Inference - 모션 시퀀스 → z 시퀀스

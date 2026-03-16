@@ -1,5 +1,5 @@
 """
-02_explore_train_config.py - train.py 구조 탐색 스크립트
+explore_train_config.py - train.py 구조 탐색 스크립트
 
 학습 파이프라인의 핵심 구성요소를 단계별로 확인합니다:
   Step 1: TrainConfig 전체 필드 & 기본값
@@ -9,9 +9,9 @@
   Step 5: 학습 하이퍼파라미터 상세 (lr, loss coefficients 등)
 
 실행:
-  uv run python study/scripts/02_explore_train_config.py
-  uv run python study/scripts/02_explore_train_config.py --step 1   # 특정 스텝만
-  uv run python study/scripts/02_explore_train_config.py --step 4   # 모델 로드 (느림)
+  uv run python study/scripts/explore_train_config.py
+  uv run python study/scripts/explore_train_config.py --step 1   # 특정 스텝만
+  uv run python study/scripts/explore_train_config.py --step 4   # 모델 로드 (느림)
 """
 
 import argparse
@@ -385,7 +385,7 @@ def main():
 
     print("=" * 70)
     print("완료! 다음 스터디: 03_fbcpr_algorithm (FB-CPR 알고리즘)")
-    print("  uv run python study/scripts/03_explore_fbcpr.py")
+    print("  uv run python study/scripts/explore_fbcpr.py")
     print("=" * 70)
 
 

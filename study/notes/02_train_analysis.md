@@ -375,5 +375,5 @@ BFM-Zero의 학습은 다음 핵심 요소로 구성됩니다:
 
 | 스크립트 | 설명 | 실행 |
 |---------|------|------|
-| `study/scripts/02_explore_train_config.py` | TrainConfig 탐색, 설정 비교, 모델 구조 확인 | `uv run python study/scripts/02_explore_train_config.py` |
+| `study/scripts/explore_train_config.py` | TrainConfig 탐색, 설정 비교, 모델 구조 확인 | `uv run python study/scripts/explore_train_config.py` |
 | `study/scripts/train_annotated.py` | train.py 상세 주석 버전 (읽기 전용) | — |

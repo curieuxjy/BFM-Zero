@@ -480,7 +480,7 @@ name = "docker-pycreds"
 version = "0.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "six", marker = "sys_platform != 'darwin'" },
+    { name = "six" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/c5/e6/d1f6c00b7221e2d7c4b470132c931325c8b22c51ca62417e300f5ce16009/docker-pycreds-0.4.0.tar.gz", hash = "sha256:6ce3270bcaf404cc4c3e27e4b6c70d3521deae82fb508767870fdbf772d584d4", size = 8754, upload-time = "2018-11-29T03:26:50.996Z" }
 wheels = [
@@ -660,7 +660,7 @@ name = "gitdb"
 version = "4.0.12"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "smmap", marker = "sys_platform != 'darwin'" },
+    { name = "smmap" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/72/94/63b0fc47eb32792c7ba1fe1b694daec9a63620db1e313033d18140c2320a/gitdb-4.0.12.tar.gz", hash = "sha256:5ef71f855d191a3326fcfbc0d5da835f26b13fbcba60c32c21091c349ffdb571", size = 394684, upload-time = "2025-01-02T07:20:46.413Z" }
 wheels = [
@@ -672,7 +672,7 @@ name = "gitpython"
 version = "3.1.44"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "gitdb", marker = "sys_platform != 'darwin'" },
+    { name = "gitdb" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/c0/89/37df0b71473153574a5cdef8f242de422a0f5d26d7a9e231e6f169b4ad14/gitpython-3.1.44.tar.gz", hash = "sha256:c87e30b26253bf5418b01b0660f818967f3c503193838337fe5e573331249269", size = 214196, upload-time = "2025-01-02T07:32:43.59Z" }
 wheels = [
@@ -1876,6 +1876,7 @@ dependencies = [
     { name = "termcolor" },
     { name = "torch" },
     { name = "tyro" },
+    { name = "wandb" },
     { name = "xxhash" },
 ]
 
@@ -1915,6 +1916,7 @@ requires-dist = [
     { name = "termcolor", specifier = ">=3.0.1" },
     { name = "torch", specifier = ">=2.5.0" },
     { name = "tyro", specifier = ">=0.9.18" },
+    { name = "wandb", specifier = ">=0.12.21" },
     { name = "xxhash", specifier = ">=3.5.0" },
 ]
 
@@ -2533,7 +2535,7 @@ name = "promise"
 version = "2.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "six", marker = "sys_platform != 'darwin'" },
+    { name = "six" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/cf/9c/fb5d48abfe5d791cd496e4242ebcf87a4bb2e0c3dcd6e0ae68c11426a528/promise-2.3.tar.gz", hash = "sha256:dfd18337c523ba4b6a58801c164c1904a9d4d1b1747c7d5dbf45b693a49d93d0", size = 19534, upload-time = "2019-12-18T07:31:43.07Z" }
 
@@ -3133,8 +3135,8 @@ name = "sentry-sdk"
 version = "2.32.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "certifi", marker = "sys_platform != 'darwin'" },
-    { name = "urllib3", marker = "sys_platform != 'darwin'" },
+    { name = "certifi" },
+    { name = "urllib3" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/10/59/eb90c45cb836cf8bec973bba10230ddad1c55e2b2e9ffa9d7d7368948358/sentry_sdk-2.32.0.tar.gz", hash = "sha256:9016c75d9316b0f6921ac14c8cd4fb938f26002430ac5be9945ab280f78bec6b", size = 334932, upload-time = "2025-06-27T08:10:02.89Z" }
 wheels = [
@@ -3147,6 +3149,8 @@ version = "1.3.6"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/9e/af/56efe21c53ac81ac87e000b15e60b3d8104224b4313b6eacac3597bd183d/setproctitle-1.3.6.tar.gz", hash = "sha256:c9f32b96c700bb384f33f7cf07954bb609d35dd82752cef57fb2ee0968409169", size = 26889, upload-time = "2025-04-29T13:35:00.184Z" }
 wheels = [
+    { url = "https://files.pythonhosted.org/packages/7d/db/8214810cae49e2e474ea741aaa7d6111486f27377e864f0eb6d297c9be56/setproctitle-1.3.6-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:ebcf34b69df4ca0eabaaaf4a3d890f637f355fed00ba806f7ebdd2d040658c26", size = 17412, upload-time = "2025-04-29T13:32:38.795Z" },
+    { url = "https://files.pythonhosted.org/packages/a4/45/909b0dcd68b16d2e58de0e861c0c0b67748ccc87ff9b59136e9710b528b1/setproctitle-1.3.6-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:1aa1935aa2195b76f377e5cb018290376b7bf085f0b53f5a95c0c21011b74367", size = 11966, upload-time = "2025-04-29T13:32:41.289Z" },
     { url = "https://files.pythonhosted.org/packages/8a/f4/f1cd54fedae1cdacf1d1db833dc096bfb1f029451f60e68563e4c26ed2f7/setproctitle-1.3.6-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:13624d9925bb481bc0ccfbc7f533da38bfbfe6e80652314f789abc78c2e513bd", size = 31350, upload-time = "2025-04-29T13:32:43.013Z" },
     { url = "https://files.pythonhosted.org/packages/5a/5f/f159b22d286a349633d4090090b8e6632fb84575a64f189b68e70a613c65/setproctitle-1.3.6-cp310-cp310-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:97a138fa875c6f281df7720dac742259e85518135cd0e3551aba1c628103d853", size = 32704, upload-time = "2025-04-29T13:32:44.215Z" },
     { url = "https://files.pythonhosted.org/packages/9c/25/e5ea2673d951dafc04b6544d7b33dd9283733d715c8f40e93d39ae35d6a0/setproctitle-1.3.6-cp310-cp310-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:c86e9e82bfab579327dbe9b82c71475165fbc8b2134d24f9a3b2edaf200a5c3d", size = 29833, upload-time = "2025-04-29T13:32:45.882Z" },
@@ -3155,8 +3159,12 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/41/60/8eb197b56b0a3110eef2a1d2ddb61b3f5809dbab9d975aa40c86e5d4b312/setproctitle-1.3.6-cp310-cp310-musllinux_1_2_i686.whl", hash = "sha256:7df5fcc48588f82b6cc8073db069609ddd48a49b1e9734a20d0efb32464753c4", size = 29758, upload-time = "2025-04-29T13:32:50.3Z" },
     { url = "https://files.pythonhosted.org/packages/db/1d/c394322a5425c12f4ada0696eb6d194768752d4e3acaca0c9d593025feb4/setproctitle-1.3.6-cp310-cp310-musllinux_1_2_ppc64le.whl", hash = "sha256:2407955dc359d735a20ac6e797ad160feb33d529a2ac50695c11a1ec680eafab", size = 32157, upload-time = "2025-04-29T13:32:52.026Z" },
     { url = "https://files.pythonhosted.org/packages/e7/24/ce080682b144f057814efbe95daac09149e90f7689e2515897817a941686/setproctitle-1.3.6-cp310-cp310-musllinux_1_2_x86_64.whl", hash = "sha256:38ca045626af693da042ac35d7332e7b9dbd52e6351d6973b310612e3acee6d6", size = 30291, upload-time = "2025-04-29T13:32:53.737Z" },
+    { url = "https://files.pythonhosted.org/packages/a7/4f/4db265493567865428dcec376f8142a9c65d27c10c3ac915d173b4053afb/setproctitle-1.3.6-cp310-cp310-win32.whl", hash = "sha256:9483aa336687463f5497dd37a070094f3dff55e2c888994f8440fcf426a1a844", size = 11492, upload-time = "2025-04-29T13:32:55.271Z" },
+    { url = "https://files.pythonhosted.org/packages/38/b0/64c3948f7957db44b4c5edfe9c197de493144dc915ddf95cf36aeca0dc52/setproctitle-1.3.6-cp310-cp310-win_amd64.whl", hash = "sha256:4efc91b437f6ff2578e89e3f17d010c0a0ff01736606473d082913ecaf7859ba", size = 12204, upload-time = "2025-04-29T13:32:56.711Z" },
+    { url = "https://files.pythonhosted.org/packages/d0/2b/f19977b646b64c1440dade2c385c89c39f74ce5254defa102dfd9c163e0b/setproctitle-1.3.6-pp310-pypy310_pp73-macosx_11_0_arm64.whl", hash = "sha256:3cde5b83ec4915cd5e6ae271937fd60d14113c8f7769b4a20d51769fe70d8717", size = 11471, upload-time = "2025-04-29T13:34:42.665Z" },
     { url = "https://files.pythonhosted.org/packages/78/46/db58cf700f1408cf0f63d3f939f7b077bd450da8e037310f70e74c41262f/setproctitle-1.3.6-pp310-pypy310_pp73-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:797f2846b546a8741413c57d9fb930ad5aa939d925c9c0fa6186d77580035af7", size = 13520, upload-time = "2025-04-29T13:34:44.287Z" },
     { url = "https://files.pythonhosted.org/packages/5c/46/0b89e7ebe77543e721c67077ad93fc8c7c3c31a8db3b12e00d02950f6adc/setproctitle-1.3.6-pp310-pypy310_pp73-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4ac3eb04bcf0119aadc6235a2c162bae5ed5f740e3d42273a7228b915722de20", size = 13094, upload-time = "2025-04-29T13:34:45.605Z" },
+    { url = "https://files.pythonhosted.org/packages/f7/78/03f2e42eb83bce6f853d7751ae95f8a3ae7408145a0b6cdd717be01497d7/setproctitle-1.3.6-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:0e6b5633c94c5111f7137f875e8f1ff48f53b991d5d5b90932f27dc8c1fa9ae4", size = 12241, upload-time = "2025-04-29T13:34:46.996Z" },
 ]
 
 [[package]]
@@ -3659,20 +3667,20 @@ name = "wandb"
 version = "0.12.21"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "click", marker = "sys_platform != 'darwin'" },
-    { name = "docker-pycreds", marker = "sys_platform != 'darwin'" },
-    { name = "gitpython", marker = "sys_platform != 'darwin'" },
-    { name = "pathtools", marker = "sys_platform != 'darwin'" },
-    { name = "promise", marker = "sys_platform != 'darwin'" },
-    { name = "protobuf", marker = "sys_platform != 'darwin'" },
-    { name = "psutil", marker = "sys_platform != 'darwin'" },
-    { name = "pyyaml", marker = "sys_platform != 'darwin'" },
-    { name = "requests", marker = "sys_platform != 'darwin'" },
-    { name = "sentry-sdk", marker = "sys_platform != 'darwin'" },
-    { name = "setproctitle", marker = "sys_platform != 'darwin'" },
-    { name = "setuptools", marker = "sys_platform != 'darwin'" },
-    { name = "shortuuid", marker = "sys_platform != 'darwin'" },
-    { name = "six", marker = "sys_platform != 'darwin'" },
+    { name = "click" },
+    { name = "docker-pycreds" },
+    { name = "gitpython" },
+    { name = "pathtools" },
+    { name = "promise" },
+    { name = "protobuf" },
+    { name = "psutil" },
+    { name = "pyyaml" },
+    { name = "requests" },
+    { name = "sentry-sdk" },
+    { name = "setproctitle" },
+    { name = "setuptools" },
+    { name = "shortuuid" },
+    { name = "six" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/7a/de/e96554c5ffbdbee7f390e6a9019da3e51cd064a08ade234cf1c192fb9097/wandb-0.12.21.tar.gz", hash = "sha256:1975ff88c5024923c3321c93cfefb8d9b871543c0b009f34001bf0f31e444b04", size = 1530491, upload-time = "2022-07-05T19:34:02.397Z" }
 wheels = [

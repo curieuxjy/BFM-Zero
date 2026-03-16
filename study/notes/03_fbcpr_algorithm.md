@@ -1107,4 +1107,5 @@ class Discriminator(nn.Module):
 
 | 스크립트 | 설명 | 실행 |
 |---------|------|------|
+| `study/scripts/explore_fbcpr.py` | FB-CPR 알고리즘 탐색 (update 흐름, 손실 함수, z 분포, 모델 연산) | `uv run python study/scripts/explore_fbcpr.py` |
 | `study/scripts/fbcpr_algorithm_annotated.py` | FB-CPR 알고리즘 상세 주석 버전 (읽기 전용) | — |

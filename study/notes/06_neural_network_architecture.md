@@ -886,4 +886,4 @@ base_model.py          nn_models.py
 |---------|------|------|
 | `study/scripts/model_architecture_compare.py` | hidden_dim/layers 변경에 따른 파라미터 수·추론 속도 비교 (모델 불필요) | `uv run python study/scripts/model_architecture_compare.py` |
 | `study/scripts/debug_tensor_shapes.py` | CPU 더미 데이터로 주요 텐서 shape 추적 (모델 불필요) | `uv run python study/scripts/debug_tensor_shapes.py` |
-| `study/scripts/02_explore_train_config.py --step 4` | 체크포인트에서 모델 구성요소별 파라미터 수 확인 | `uv run python study/scripts/02_explore_train_config.py --step 4` |
+| `study/scripts/explore_train_config.py --step 4` | 체크포인트에서 모델 구성요소별 파라미터 수 확인 | `uv run python study/scripts/explore_train_config.py --step 4` |

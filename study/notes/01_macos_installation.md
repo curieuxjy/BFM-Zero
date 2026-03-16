@@ -53,7 +53,7 @@ uv sync
 
 ### 4. 누락된 패키지 추가
 ```bash
-uv add imageio
+uv add imageio wandb
 ```
 
 ---

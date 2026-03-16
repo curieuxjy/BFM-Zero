@@ -582,10 +582,10 @@ uv run python study/scripts/model_architecture_compare.py
 uv run python study/scripts/debug_tensor_shapes.py              # 텐서 shape 추적
 uv run python study/scripts/model_architecture_compare.py       # 아키텍처 비교
 uv run python study/scripts/mujoco_viewer_test.py               # MuJoCo 렌더링 테스트
-uv run python study/scripts/02_explore_train_config.py          # train.py 구조 탐색 (step 4 제외)
+uv run python study/scripts/explore_train_config.py          # train.py 구조 탐색 (step 4 제외)
 
 # === 모델 필요 ===
-uv run python study/scripts/02_explore_train_config.py --step 4                          # 모델 구성요소 확인
+uv run python study/scripts/explore_train_config.py --step 4                          # 모델 구성요소 확인
 uv run python study/scripts/tracking_inference_macos.py --model_folder model/            # 트래킹 추론 (참조모션 비교)
 uv run python study/scripts/goal_inference_macos.py --model_folder model/                # 골 추론
 uv run python study/scripts/analyze_z_vectors.py --model_folder model/                   # z 벡터 분석
