@@ -15,8 +15,8 @@ simulator:
       fps: 200
       control_decimation: 4
       substeps: 1
-      render_mode: "human"
-      render_interval: 4
+      render_mode: "human" # [None, "human", "rgb_array"]
+      render_interval: 1
 
     scene:
       num_envs: ${num_envs}
